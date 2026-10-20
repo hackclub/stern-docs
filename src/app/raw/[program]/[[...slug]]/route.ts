@@ -47,5 +47,12 @@ export async function GET(
     "",
   ].join("\n");
 
-  return new Response(`${header}${doc.body}\n`, { headers: MARKDOWN_HEADERS });
+  // The HTML page is the one to index; this is its source. A Link header is
+  // the only way a text response can say so.
+  return new Response(`${header}${doc.body}\n`, {
+    headers: {
+      ...MARKDOWN_HEADERS,
+      Link: `<${SITE_URL}${doc.href}>; rel="canonical"`,
+    },
+  });
 }

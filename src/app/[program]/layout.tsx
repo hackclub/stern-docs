@@ -4,6 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DocsShell } from "@/components/docs-shell";
 import { EmbedBridge } from "@/components/embed-bridge";
+import { Horizon } from "@/components/horizon";
+import { Mascot } from "@/components/mascot";
 import { Insight } from "@/components/insight";
 import { JoinPanel } from "@/components/join-panel";
 import { RoundStatus } from "@/components/round-status";
@@ -215,7 +217,19 @@ export default async function ProgramLayout({
         {children}
       </DocsShell>
 
-      <footer className="site-foot site-only">
+      {/* A program with its own marks gets the site's closer: the paper runs
+          back into the sky over a drawn horizon, and the mascot peeks over
+          the bottom edge. Everyone else gets the plain ruled footer. */}
+      <footer
+        className={
+          content.config.brand
+            ? "site-foot site-foot--sky site-only"
+            : "site-foot site-only"
+        }
+      >
+        {content.config.brand ? (
+          <Horizon flip className="site-foot__horizon" />
+        ) : null}
         <div className="site-foot__inner">
           {/* Whose program this is. The flag is the official mark, unmodified. */}
           <div className="site-foot__col">
@@ -310,6 +324,14 @@ export default async function ProgramLayout({
             </ul>
           </div>
         </div>
+        {content.config.brand?.icon ? (
+          <Mascot
+            className="site-foot__mascot"
+            src={content.config.brand.icon}
+            pose="peek"
+            size={132}
+          />
+        ) : null}
       </footer>
     </div>
   );

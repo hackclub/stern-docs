@@ -35,6 +35,16 @@ export const TEXT_HEADERS = {
   "Access-Control-Allow-Origin": "*",
 } as const;
 
+/**
+ * For the agent-facing text files: a search engine should index the pages,
+ * not a concatenation of them. Not applied to /raw/…, which carries a
+ * canonical link to its page instead.
+ */
+export const NOINDEX_HEADERS = {
+  ...TEXT_HEADERS,
+  "X-Robots-Tag": "noindex",
+} as const;
+
 export const MARKDOWN_HEADERS = {
   ...TEXT_HEADERS,
   "Content-Type": "text/markdown; charset=utf-8",

@@ -1,5 +1,5 @@
 import { listPrograms } from "@/lib/content";
-import { buildIndex, TEXT_HEADERS } from "@/lib/llms";
+import { buildIndex, NOINDEX_HEADERS } from "@/lib/llms";
 
 /**
  * `/llms.txt`  the llmstxt.org-shaped index of everything here.
@@ -11,5 +11,5 @@ export const revalidate = 300;
 
 export async function GET() {
   const body = await buildIndex(await listPrograms(), Date.now());
-  return new Response(body, { headers: TEXT_HEADERS });
+  return new Response(body, { headers: NOINDEX_HEADERS });
 }

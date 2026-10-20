@@ -1341,16 +1341,80 @@ html[data-nav="0"] .site-bar {
   }
 }
 
-/* ══ Wordmark on the docs home ══════════════════════════════════════════════ */
+/* ══ The sky ════════════════════════════════════════════════════════════════ */
 
-/* The program's own mark, where the title would be. Drawn as drawn: no panel
-   behind it, no tint, nothing recoloured. */
-.doc-art {
-  width: min(100%, 30rem);
+/**
+ * Borrowed from the program's own site: everything you rent lives up in the
+ * sky, so the docs home opens on a band of it, carrying the wordmark, and the
+ * band ends where the paper starts, on a horizon that is drawn rather than
+ * ruled. The one edge on the page that is allowed a wobble.
+ */
+.sky {
+  position: relative;
+  background: var(--sky);
+  border-radius: var(--radius-panel);
+  overflow: hidden;
+  padding: clamp(1.1rem, 3.5vw, 2rem) clamp(0.8rem, 3vw, 2rem) 2.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* The art carries transparent margin on every side; let it fill the band. */
+.sky__art {
+  display: block;
+  width: min(100%, 38rem);
   max-width: 100%;
   height: auto;
+  margin: -2% auto -3%;
+}
+
+.horizon {
   display: block;
-  margin: 0.25rem 0 0.9rem -0.6rem; /* optical: the art has its own margin */
+}
+
+.horizon--flip {
+  transform: rotate(180deg);
+}
+
+.sky__horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 26px;
+  color: var(--background);
+}
+
+/* ══ Mascot ═════════════════════════════════════════════════════════════════ */
+
+/* How he sits, never how he is drawn. He holds still: a mascot that bobs at
+   the foot of every page is a distraction, not a character. */
+.mascot {
+  width: min(var(--mascot-size), 34vw);
+  height: auto;
+  /* A soft drawing: a hard shadow would be a costume, a wide low one reads as
+     the paper he sits on. */
+  filter: drop-shadow(0 10px 18px rgba(38, 55, 74, 0.13));
+}
+
+.mascot--flip {
+  transform: scaleX(-1);
+}
+
+.mascot--lean {
+  transform: rotate(-7deg);
+}
+
+.mascot--lean.mascot--flip {
+  transform: scaleX(-1) rotate(-7deg);
+}
+
+.mascot--peek {
+  transform: rotate(11deg);
+}
+
+.mascot--peek.mascot--flip {
+  transform: scaleX(-1) rotate(11deg);
 }
 
 /* ══ Sources ════════════════════════════════════════════════════════════════ */
@@ -1404,6 +1468,69 @@ html[data-nav="0"] .site-bar {
 }
 
 /* ══ Footer, three columns ══════════════════════════════════════════════════ */
+
+/* With a program's own marks, the foot of the page runs back into the sky
+   over the flipped horizon, and the mascot peeks over the bottom edge. */
+.site-foot--sky {
+  position: relative;
+  overflow: hidden;
+  margin-top: 4rem;
+  padding-top: 3.2rem;
+  background: var(--sky);
+  color: var(--on-sky);
+  border-top: 0;
+}
+
+.site-foot__horizon {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 26px;
+  color: var(--background);
+}
+
+.site-foot--sky .site-foot__text,
+.site-foot--sky .silkscreen,
+.site-foot--sky .site-foot__col ul {
+  color: var(--on-sky);
+}
+
+.site-foot--sky .site-foot__text a,
+.site-foot--sky .site-foot__col ul a {
+  color: var(--on-sky);
+  text-decoration-color: var(--sky-deep);
+}
+
+.site-foot--sky .site-foot__text a:hover,
+.site-foot--sky .site-foot__col ul a:hover {
+  color: var(--sky-deep);
+}
+
+.site-foot--sky .site-foot__label {
+  border-bottom-color: var(--sky-rule);
+}
+
+/* Room for him at the right end on wide screens; on a phone he sits above the
+   columns instead of over them. */
+.site-foot__mascot {
+  display: block;
+  margin: 0 0 0.5rem auto;
+}
+
+@media (min-width: 720px) {
+  .site-foot--sky .site-foot__inner {
+    padding-right: 9rem;
+  }
+
+  .site-foot__mascot {
+    position: absolute;
+    right: clamp(1rem, 4vw, 3rem);
+    bottom: -1.4rem;
+    margin: 0;
+  }
+}
 
 .site-foot__inner {
   max-width: 1440px;

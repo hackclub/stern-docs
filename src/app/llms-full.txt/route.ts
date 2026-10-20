@@ -1,5 +1,5 @@
 import { listPrograms } from "@/lib/content";
-import { buildFullText, TEXT_HEADERS } from "@/lib/llms";
+import { buildFullText, NOINDEX_HEADERS, TEXT_HEADERS } from "@/lib/llms";
 
 /**
  * `/llms-full.txt`  every page's markdown in one response, for pasting into a
@@ -26,5 +26,5 @@ export async function GET(request: Request) {
   }
 
   const body = await buildFullText(scoped, Date.now());
-  return new Response(body, { headers: TEXT_HEADERS });
+  return new Response(body, { headers: NOINDEX_HEADERS });
 }

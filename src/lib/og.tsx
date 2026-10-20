@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { HORIZON_PATH } from "@/components/horizon";
 import { loadProgramContent, programName, type DocsConfig } from "@/lib/content";
 import { fetchProgram, type Program } from "@/lib/program";
 import {
@@ -37,6 +38,12 @@ const FONTS = [
 ];
 
 const FLAG_SRC = `data:image/svg+xml;base64,${flagSvg.toString("base64")}`;
+
+/** The drawn horizon as an image, in the colour of the paper under the sky. */
+const horizonSrc = (fill: string) =>
+  `data:image/svg+xml;base64,${Buffer.from(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 40" preserveAspectRatio="none"><path fill="${fill}" d="${HORIZON_PATH}"/></svg>`,
+  ).toString("base64")}`;
 
 /**
  * A mark from public/, inlined. The card is rendered on the server, often at
@@ -94,12 +101,9 @@ export type OgCard = {
 };
 
 /**
- * The share card.
- *
- * Same panel language as the site  brand seam across the top, silkscreen
- * labels, the Hack Club flag and the program's own mark  because a link
- * dropped in a Slack channel is often the first thing anyone sees of these
- * docs, and it should read as the program's own equipment.
+ * The share card: the docs home in miniature. A band of sky carrying the flag
+ * and the program's wordmark, a drawn horizon, and the page's title on the
+ * paper below  so a link dropped in Slack looks like the thing it opens.
  */
 export async function docOgImage(program: string, card: OgCard) {
   const content = await loadProgramContent(program);
@@ -120,7 +124,7 @@ export async function docOgImage(program: string, card: OgCard) {
   // them. Without a local wordmark the program name has to carry that itself.
   const eyebrow = wordmark ? (card.section ?? "") : `${name} docs`;
   const title = card.title;
-  const titleSize = title.length > 44 ? 64 : title.length > 28 ? 76 : 92;
+  const titleSize = title.length > 44 ? 60 : title.length > 28 ? 72 : 84;
   const host = SITE_URL.replace(/^https?:\/\//, "");
 
   return new ImageResponse(
@@ -131,152 +135,146 @@ export async function docOgImage(program: string, card: OgCard) {
           height: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
           background: c.background,
-          padding: "60px 72px 56px",
           fontFamily: "Plex Sans",
           position: "relative",
         }}
       >
-        {/* Brand seam  the one piece of colour, top edge, like the site. */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 10,
-            background: `linear-gradient(90deg, ${c.brand} 0%, ${c.brand2} 60%, ${c.background} 100%)`,
-          }}
-        />
-        {/* Rack units: the faint ruled grid the page body also sits on. */}
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage: `linear-gradient(${c.hairline} 1px, transparent 1px)`,
-            backgroundSize: "100% 28px",
-            opacity: 0.45,
-          }}
-        />
-
+        {/* The sky, with the brand seam along its top edge like the site. */}
         <div
           style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            height: 232,
+            padding: "0 72px 24px",
+            background: c.sky,
+            position: "relative",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={FLAG_SRC}
-              alt=""
-              width={120}
-              height={42}
-              style={{ marginRight: 26 }}
-            />
-            {eyebrow ? (
-              <div
-                style={{
-                  fontFamily: "Plex Mono",
-                  color: c.muted,
-                  fontSize: 22,
-                  letterSpacing: 5,
-                  textTransform: "uppercase",
-                }}
-              >
-                {eyebrow}
-              </div>
-            ) : null}
-          </div>
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 10,
+              background: `linear-gradient(90deg, ${c.brand} 0%, ${c.brand2} 60%, ${c.sky} 100%)`,
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={FLAG_SRC} alt="" width={150} height={52} />
           {mark ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={mark}
               alt=""
-              width={markIsWide ? 240 : 72}
-              height={markIsWide ? 90 : 72}
+              width={markIsWide ? 360 : 96}
+              height={markIsWide ? 135 : 96}
               style={{ objectFit: "contain" }}
             />
           ) : null}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={horizonSrc(c.background)}
+            alt=""
+            width={1200}
+            height={36}
+            style={{ position: "absolute", left: 0, bottom: -1 }}
+          />
         </div>
 
+        {/* The paper. */}
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
+            justifyContent: "space-between",
             flexGrow: 1,
-            paddingTop: 24,
-            paddingBottom: 24,
+            padding: "28px 72px 48px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              fontFamily: "Plex Condensed",
-              fontSize: titleSize,
-              lineHeight: 1.02,
-              color: c.foreground,
-              fontWeight: 600,
-              letterSpacing: -1.5,
-              maxWidth: 1000,
-            }}
-          >
-            {title}
-          </div>
-          {card.description ? (
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {eyebrow ? (
+              <div
+                style={{
+                  fontFamily: "Plex Mono",
+                  color: c.muted,
+                  fontSize: 21,
+                  letterSpacing: 5,
+                  textTransform: "uppercase",
+                  marginBottom: 14,
+                }}
+              >
+                {eyebrow}
+              </div>
+            ) : null}
             <div
               style={{
                 display: "flex",
-                marginTop: 22,
-                fontSize: 28,
-                lineHeight: 1.35,
-                color: c.muted,
-                maxWidth: 940,
+                fontFamily: "Plex Condensed",
+                fontSize: titleSize,
+                lineHeight: 1.02,
+                color: c.foreground,
+                fontWeight: 600,
+                letterSpacing: -1.5,
+                maxWidth: 1000,
               }}
             >
-              {card.description.length > 150
-                ? `${card.description.slice(0, 147).trimEnd()}…`
-                : card.description}
+              {title}
             </div>
-          ) : null}
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            fontFamily: "Plex Mono",
-            fontSize: 22,
-            letterSpacing: 3,
-            textTransform: "uppercase",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", color: c.brand }}>
-            {status ? (
-              <>
-                <div
-                  style={{
-                    width: 14,
-                    height: 14,
-                    borderRadius: 7,
-                    background: status.live ? c.brand : c.hairline,
-                    boxShadow: status.live ? `0 0 0 5px ${c.brand}33` : "none",
-                    marginRight: 16,
-                  }}
-                />
-                {status.text}
-              </>
+            {card.description ? (
+              <div
+                style={{
+                  display: "flex",
+                  marginTop: 18,
+                  fontSize: 27,
+                  lineHeight: 1.35,
+                  color: c.muted,
+                  maxWidth: 940,
+                }}
+              >
+                {card.description.length > 150
+                  ? `${card.description.slice(0, 147).trimEnd()}…`
+                  : card.description}
+              </div>
             ) : null}
           </div>
-          {/* The docs home, not the page path: a long slug wraps into the
-              status line. One string, not two text nodes, because satori wants
-              explicit flex for anything with more than one child. */}
-          <div style={{ color: c.muted, flexShrink: 0, marginLeft: 32 }}>
-            {`${host}/${program}`}
+
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontFamily: "Plex Mono",
+              fontSize: 21,
+              letterSpacing: 3,
+              textTransform: "uppercase",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", color: c.brand }}>
+              {status ? (
+                <>
+                  <div
+                    style={{
+                      width: 14,
+                      height: 14,
+                      borderRadius: 7,
+                      background: status.live ? c.brand : c.hairline,
+                      boxShadow: status.live ? `0 0 0 5px ${c.brand}33` : "none",
+                      marginRight: 16,
+                    }}
+                  />
+                  {status.text}
+                </>
+              ) : null}
+            </div>
+            {/* The docs home, not the page path: a long slug wraps into the
+                status line. One string, not two text nodes, because satori wants
+                explicit flex for anything with more than one child. */}
+            <div style={{ color: c.muted, flexShrink: 0, marginLeft: 32 }}>
+              {`${host}/${program}`}
+            </div>
           </div>
         </div>
       </div>

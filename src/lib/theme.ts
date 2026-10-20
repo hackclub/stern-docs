@@ -96,6 +96,14 @@ export function generateTokens(seed: ThemeSeed): ThemeVars {
     "--wash": oklch(accentL, accentC, h, 9),
     "--code-bg": oklch(0.985, tint(0.012), h),
     "--code-border": oklch(0.2, tint(0.02), h, 10),
+
+    // The sky: the band a program's wordmark sits on at the top of its docs
+    // home, and the one the page runs back into at the foot. A pale tint of
+    // the brand hue with its own ink, so text on it still reads.
+    "--sky": oklch(0.905, tint(0.045), h),
+    "--sky-deep": oklch(0.5, Math.max(tint(0.1), 0.06), h),
+    "--on-sky": oklch(0.32, tint(0.05), h),
+    "--sky-rule": oklch(0.32, tint(0.05), h, 16),
     "--shadow-panel": `0 1px 0 ${oklch(1, 0, h, 90)}, 0 10px 30px -20px ${oklch(0.2, tint(0.02), h, 35)}`,
   };
 }
@@ -138,5 +146,7 @@ export function ogColors(seed: ThemeSeed) {
       second.h,
     ),
     hairline: oklchToHex(0.9, tint(0.02), brand.h),
+    sky: oklchToHex(0.905, tint(0.045), brand.h),
+    onSky: oklchToHex(0.32, tint(0.05), brand.h),
   };
 }

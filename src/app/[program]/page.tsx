@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DocView } from "@/components/doc-view";
+import { Horizon } from "@/components/horizon";
 import { findDoc, loadProgramContent, programName } from "@/lib/content";
 import { jsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
@@ -18,8 +19,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const home = findDoc(content, []);
   const description = home?.description ?? content.config.tagline ?? undefined;
   return {
-    // The layout's template would otherwise render "CloudFALL docs · CloudFALL docs".
-    title: { absolute: content.config.title },
+    // The layout's template would otherwise render "CloudFALL docs · CloudFALL
+    // docs"; the organisation goes on the home title instead, where someone
+    // searching for the program by name and sponsor lands.
+    title: { absolute: `${content.config.title} · Hack Club` },
     description,
     alternates: { canonical: `/${program}` },
     openGraph: {
@@ -39,8 +42,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
  * on a landing page the fastest thing you can give someone is the shape of the
  * whole manual.
  *
- * When docs.json names a wordmark, it stands where the title would: the one
- * piece of the program's own art on the page, drawn as drawn. The h1 stays in
+ * When docs.json names a wordmark, it stands where the title would, on a band
+ * of sky: the one piece of the program's own art on the page. The h1 stays in
  * the document for crawlers and screen readers, just not on screen twice.
  */
 export default async function ProgramHome({ params }: Params) {
@@ -51,17 +54,22 @@ export default async function ProgramHome({ params }: Params) {
   const home = findDoc(content, []);
   if (!home) notFound();
 
+  // The sky: the program's wordmark on a pale band of its own colour, closed
+  // by a hand-drawn horizon where the paper starts. The art is drawn as drawn.
   const brand = content.config.brand;
   const art = brand?.wordmark ? (
-    <Image
-      className="doc-art"
-      src={brand.wordmark}
-      alt={brand.wordmarkAlt ?? programName(content.config)}
-      width={1602}
-      height={599}
-      priority
-      unoptimized
-    />
+    <div className="sky">
+      <Image
+        className="sky__art"
+        src={brand.wordmark}
+        alt={brand.wordmarkAlt ?? programName(content.config)}
+        width={1602}
+        height={599}
+        sizes="(min-width: 1024px) 38rem, 100vw"
+        priority
+      />
+      <Horizon className="sky__horizon" />
+    </div>
   ) : null;
 
   return (
