@@ -1,5 +1,5 @@
 import { findDoc, loadProgramContent } from "@/lib/content";
-import { MARKDOWN_HEADERS } from "@/lib/llms";
+import { creditLines, MARKDOWN_HEADERS } from "@/lib/llms";
 import { SITE_URL } from "@/lib/site";
 
 /**
@@ -42,6 +42,7 @@ export async function GET(
     `${doc.title}${doc.description ? `  ${doc.description}` : ""}`,
     `Page: ${SITE_URL}${doc.href}`,
     `Source: ${doc.filePath}`,
+    ...creditLines(doc, content),
     `-->`,
     "",
   ].join("\n");

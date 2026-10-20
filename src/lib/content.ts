@@ -44,6 +44,9 @@ const SHARED_DIR = "_shared";
 const isProgramFolder = (name: string) =>
   !name.startsWith(".") && !name.startsWith("_");
 
+/** A link in the sidebar footer, the program footer, or a credit line. */
+export type ConfigLink = { label: string; href: string };
+
 export type DocsConfig = {
   /** Display title of this docs site, e.g. "CloudFALL docs". */
   title: string;
@@ -65,13 +68,49 @@ export type DocsConfig = {
     source?: "accent" | "images";
     sourceImage?: "logo" | "background" | "banner" | "cover";
   };
+  /**
+   * The program's own marks, served from public/. stern supplies a logo too,
+   * but stern is a live dependency and this site must still look like the
+   * program when stern can't be reached. Paths are site-relative ("/programs/…").
+   *
+   * - `wordmark`: the full-colour mark for the docs home and the share card.
+   * - `icon`: a square mark for the header and the browser tab.
+   * - `credit`: who drew them. Rendered in the footer, never omitted.
+   */
+  brand?: {
+    wordmark?: string;
+    wordmarkAlt?: string;
+    icon?: string;
+    credit?: ConfigLink;
+  };
+  /** The program's public website, if it has one beyond stern. */
+  site?: string;
+  /** The program's home on stern. Falls back to the API's `links.home`. */
+  stern?: string;
+  /** Who writes these docs. Overrides NEXT_PUBLIC_AUTHOR_* for this program. */
+  author?: { name: string; href?: string };
   /** Extra links in the sidebar footer  Slack, the program site, source. */
-  links?: { label: string; href: string }[];
+  links?: ConfigLink[];
   /** `owner/repo` for edit links; falls back to NEXT_PUBLIC_CONTENT_REPO. */
   repo?: string;
   branch?: string;
   /** Copy for the join CTA. The CTA only ever shows while the round is open. */
   join?: { label?: string; blurb?: string };
+};
+
+/**
+ * Where a page's words came from, when they weren't written here. Every page
+ * is either hand-written by `author` or copied verbatim from these, and the
+ * site renders them at the foot of the page so the credit ships with the text.
+ */
+export type DocSource = {
+  /** What was taken, in the source's own words: a section title, a file. */
+  label: string;
+  href: string | null;
+  /** Who wrote it. */
+  author: string | null;
+  /** How it was carried over  "verbatim", "rows reformatted as a table". */
+  note: string | null;
 };
 
 export type Doc = {
@@ -83,6 +122,10 @@ export type Doc = {
   group: string | null;
   order: number;
   hidden: boolean;
+  /** Who wrote the page, when the frontmatter says. Null means the site author. */
+  author: string | null;
+  /** Credited sources for copied text. Empty for a page written here. */
+  sources: DocSource[];
   /** Raw markdown body, frontmatter stripped. */
   body: string;
   /** Repo-relative path, for the "Edit this page" link. */
@@ -148,6 +191,32 @@ const titleize = (slug: string) =>
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
+const optionalString = (value: unknown): string | null =>
+  typeof value === "string" && value.trim() !== "" ? value.trim() : null;
+
+/**
+ * `sources:` is a list; anything without a `label` is dropped rather than
+ * rendered as an empty credit. scripts/check-content.mjs fails the build on
+ * the malformed shapes before they get this far.
+ */
+export function parseSources(value: unknown): DocSource[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const record = entry as Record<string, unknown>;
+    const label = optionalString(record.label);
+    if (!label) return [];
+    return [
+      {
+        label,
+        href: optionalString(record.href),
+        author: optionalString(record.author),
+        note: optionalString(record.note),
+      },
+    ];
+  });
+}
+
 /**
  * `program` decides the URL, `root` decides everything else  a shared page is
  * routed under whichever program is being rendered, but its edit link has to
@@ -182,6 +251,8 @@ function parseDoc(
     group: typeof data.group === "string" ? data.group : null,
     order: typeof data.order === "number" ? data.order : 999,
     hidden: data.hidden === true,
+    author: optionalString(data.author),
+    sources: parseSources(data.sources),
     body: parsed.content.trim(),
     filePath: ["content", ...path.relative(CONTENT_ROOT, absolute).split(path.sep)].join(
       "/",
@@ -313,4 +384,9 @@ export function editUrl(
   if (!repo) return null;
   const branch = config.branch || fallbackBranch;
   return `https://github.com/${repo}/edit/${branch}/${doc.filePath}`;
+}
+
+/** The program's short name: "CloudFALL docs" → "CloudFALL". */
+export function programName(config: DocsConfig): string {
+  return config.title.replace(/\s+docs$/i, "").trim() || config.title;
 }

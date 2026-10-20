@@ -19,5 +19,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }));
     }),
   );
-  return entries.flat();
+  return [
+    ...entries.flat(),
+    {
+      url: `${SITE_URL}/embed`,
+      changeFrequency: "monthly" as const,
+      priority: 0.3,
+    },
+  ];
 }

@@ -14,6 +14,18 @@ const EMBEDDABLE_HEADERS = [
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
 ];
 
+/**
+ * The share card reads the Plex fonts, the Hack Club flag and a program's
+ * wordmark from disk (lib/og.tsx), by paths it builds at runtime. File tracing
+ * can't follow a path it can't see, so the two routes that draw cards are told
+ * what to ship.
+ */
+const OG_ASSETS = [
+  "./src/assets/fonts/**/*",
+  "./public/brand/**/*",
+  "./public/programs/**/*",
+];
+
 const nextConfig: NextConfig = {
   images: {
     // Program artwork (logo, banner, background) is served from Hack Club's CDN;
@@ -22,6 +34,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "cdn.hackclub.com" },
       { protocol: "https", hostname: "hc-cdn.hel1.your-objectstorage.com" },
     ],
+  },
+  outputFileTracingIncludes: {
+    "/og": OG_ASSETS,
+    "/\\[program\\]/opengraph-image": OG_ASSETS,
   },
   async headers() {
     return [

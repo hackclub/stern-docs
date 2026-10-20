@@ -13,7 +13,7 @@
  *     recomputed locally from `startsAt`/`endsAt` (see lib/schedule.ts).
  */
 
-import { STERN_API_BASE } from "@/lib/site";
+import { SITE_URL, STERN_API_BASE } from "@/lib/site";
 
 export type ProgramImages = {
   cover: string | null;
@@ -103,6 +103,13 @@ export async function fetchProgram(slug: string): Promise<Program | null> {
   const url = `${STERN_API_BASE}/api/public/programs/${encodeURIComponent(slug)}`;
   try {
     const response = await fetch(url, {
+      // Say who's asking. stern sits behind Vercel's bot challenge, which has
+      // no way to let an anonymous server-side fetch through; a named agent
+      // is at least something an allow rule can be written against.
+      headers: {
+        accept: "application/json",
+        "user-agent": `stern-docs/1.0 (+${SITE_URL})`,
+      },
       next: { revalidate: 300, tags: [`program:${slug}`] },
       signal: AbortSignal.timeout(8000),
     });

@@ -20,6 +20,14 @@ export async function GET(request: Request) {
 
   const segments = (params.get("slug") ?? "").split("/").filter(Boolean);
   const doc = findDoc(content, segments);
+  const section = doc
+    ? content.nav.find((group) => group.id === doc.group)?.label
+    : null;
 
-  return docOgImage(program, doc?.title ?? content.config.title);
+  return docOgImage(program, {
+    title: doc?.title ?? content.config.title,
+    description: doc?.description ?? null,
+    section: section ?? null,
+    path: doc?.href ?? `/${program}`,
+  });
 }

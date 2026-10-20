@@ -56,6 +56,8 @@ Body text, in markdown.
 | `group`       | Which section of the sidebar it appears in must match an `id` in `docs.json`                                     |
 | `order`       | Position within the section; ties break alphabetically                                                           |
 | `hidden`      | `true` keeps it out of the nav and search, but the URL still works good for a draft you want to share for review |
+| `author`      | Who wrote the page. Falls back to the site's author                                                              |
+| `sources`     | Where copied text came from: a list of `label`, `href`, `author`, `note`. Rendered at the foot of the page       |
 
 Filenames become URLs: `content/cloudfall/getting-started.md` is
 `/cloudfall/getting-started`. A folder's `index.md` is the folder's own page.

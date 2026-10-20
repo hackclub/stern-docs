@@ -1,6 +1,25 @@
 {
   "title": "CloudFALL docs",
   "tagline": "Stop wasting money, build it yourself",
+  "theme": {
+    "brand": "#5484a8",
+    "secondary": "#fc9c6c"
+  },
+  "author": {
+    "name": "Archer",
+    "href": "https://hackclub.enterprise.slack.com/archives/C0BHZLZF8BX"
+  },
+  "site": "https://cloudfall.hackclub.com",
+  "stern": "https://stern.hackclub.com/a/cloudfall/home",
+  "brand": {
+    "wordmark": "/programs/cloudfall/wordmark.png",
+    "wordmarkAlt": "cloudFALL",
+    "icon": "/programs/cloudfall/mascot.png",
+    "credit": {
+      "label": "Wordmark and mascot drawn by Archer",
+      "href": "https://github.com/AD-Archer/cloudFALL"
+    }
+  },
   "groups": [
     {
       "id": "start",
@@ -21,6 +40,10 @@
       "id": "help",
       "label": "When you're stuck",
       "blurb": "Answers, and how to fix a page that's wrong."
+    },
+    {
+      "id": "about",
+      "label": "About"
     }
   ],
   "join": {
@@ -29,8 +52,12 @@
   },
   "links": [
     {
-      "label": "CloudFALL.hackclub.com",
+      "label": "cloudfall.hackclub.com",
       "href": "https://cloudfall.hackclub.com"
+    },
+    {
+      "label": "CloudFALL on stern",
+      "href": "https://stern.hackclub.com/a/cloudfall/home"
     },
     {
       "label": "#ysws-CloudFALL on Slack",

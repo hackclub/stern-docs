@@ -1,0 +1,10 @@
+IBM Plex Sans, IBM Plex Sans Condensed and IBM Plex Mono
+Copyright (c) 2017 IBM Corp. with Reserved Font Name "Plex"
+
+Licensed under the SIL Open Font License, Version 1.1.
+https://github.com/IBM/plex/blob/master/LICENSE.txt
+
+These are the latin subsets published by fontsource
+(@fontsource/ibm-plex-sans, @fontsource/ibm-plex-sans-condensed,
+@fontsource/ibm-plex-mono, version 5.3.0). They are read by src/lib/og.tsx to
+draw share cards; the page itself loads the same family from Google Fonts.

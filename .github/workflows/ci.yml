@@ -33,6 +33,10 @@ jobs:
 
       - run: pnpm lint
 
+      # Frontmatter shape, credits on copied text, and the spelling of
+      # "Hack Club". The cheap checks a github.com editor can't run.
+      - run: pnpm check:content
+
       - run: pnpm exec tsc --noEmit
 
       # Palette extraction reaches out to the CDN and the program API; neither is

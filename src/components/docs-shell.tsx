@@ -13,7 +13,10 @@ export type DocsShellProps = {
   title: string;
   tagline: string | null;
   homeHref: string;
+  /** The program's square mark: stern's logo, or the docs.json `brand.icon`. */
   logo: string | null;
+  /** The Hack Club flag, hanging off the top of the bar, and where it goes. */
+  flag: { src: string; href: string };
   groups: RailGroup[];
   links: { label: string; href: string }[];
   search: SearchEntry[];
@@ -39,6 +42,10 @@ export type DocsShellProps = {
  * and looked like a bug. The round now reports itself in a single line of the one
  * header there is.
  *
+ * The flag: every Hack Club site hangs the flag off the top edge of the page,
+ * so this one does too  it's the one mark that says whose program this is
+ * without a word, and it doesn't depend on stern being reachable.
+ *
  * The rail: every page is a labelled port with a status LED, exactly one lit
  * the page you're on, the same read as a rack. Colour is never the only signal;
  * the active row also gets a brand rail down its left edge and a weight change,
@@ -49,6 +56,7 @@ export function DocsShell({
   tagline,
   homeHref,
   logo,
+  flag,
   groups,
   links,
   search,
@@ -65,22 +73,43 @@ export function DocsShell({
     <>
       <header className="site-bar">
         <div className="site-bar__inner">
-          <Link href={homeHref} className="site-brand">
-            {logo ? (
+          <div className="site-brand-row">
+            <a
+              className="site-flag"
+              href={flag.href}
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Hack Club"
+            >
               <Image
-                src={logo}
+                src={flag.src}
                 alt=""
-                width={32}
-                height={32}
-                className="site-logo"
+                width={280}
+                height={158}
                 unoptimized
+                priority
               />
-            ) : null}
-            <span className="site-brand__text">
-              <span className="site-title display">{title}</span>
-              {tagline ? <span className="site-tagline">{tagline}</span> : null}
-            </span>
-          </Link>
+            </a>
+
+            <Link href={homeHref} className="site-brand">
+              {logo ? (
+                <Image
+                  src={logo}
+                  alt=""
+                  width={32}
+                  height={32}
+                  className="site-logo"
+                  unoptimized
+                />
+              ) : null}
+              <span className="site-brand__text">
+                <span className="site-title display">{title}</span>
+                {tagline ? (
+                  <span className="site-tagline">{tagline}</span>
+                ) : null}
+              </span>
+            </Link>
+          </div>
 
           <div className="site-bar__actions">
             {status}

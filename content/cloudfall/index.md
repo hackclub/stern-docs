@@ -19,7 +19,7 @@ These docs will serve as a way to learn how to replace these subscriptions, how 
 
 ## The shape of it
 
-1. **Sign up and get your hours counted.** You must be a member of [hackclub auth](https://auth.hackclub.com)
+1. **Sign up and get your hours counted.** You must be a member of [Hack Club Auth](https://auth.hackclub.com)
    More help at [Getting started](/cloudfall/getting-started).
 2. **Pick something you actually pay for.** The best CloudFALL projects replace a
    specific line on a specific bill. [Pick a project](/cloudfall/pick-a-project)

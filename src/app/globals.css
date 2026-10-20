@@ -1306,3 +1306,191 @@ html[data-nav="0"] .site-bar {
   font-size: clamp(1.9rem, 5vw, 2.6rem);
   font-weight: 700;
 }
+
+/* ══ Hack Club flag ════════════════════════════════════════════════════════ */
+
+/**
+ * Every Hack Club site hangs the flag off the top edge of the page. Here it
+ * hangs off the top of the sticky bar, so it's present at every scroll
+ * position without taking a row of its own. The mark is official and
+ * unmodified; only its size changes.
+ */
+.site-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.site-flag {
+  align-self: flex-start;
+  margin-top: -0.62rem;
+  flex: none;
+  line-height: 0;
+}
+
+.site-flag img {
+  width: 4.25rem;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 639px) {
+  .site-flag img {
+    width: 3.1rem;
+  }
+}
+
+/* ══ Wordmark on the docs home ══════════════════════════════════════════════ */
+
+/* The program's own mark, where the title would be. Drawn as drawn: no panel
+   behind it, no tint, nothing recoloured. */
+.doc-art {
+  width: min(100%, 30rem);
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.25rem 0 0.9rem -0.6rem; /* optical: the art has its own margin */
+}
+
+/* ══ Sources ════════════════════════════════════════════════════════════════ */
+
+/* The credit at the foot of every page: a footnote, ruled off from the prose,
+   not a box. */
+.sources {
+  margin-top: 2.6rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hairline);
+}
+
+.sources__list {
+  list-style: none;
+  margin: 0.6rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.86rem;
+}
+
+.sources__list a,
+.sources__page a {
+  text-decoration: underline;
+  text-decoration-color: var(--brand);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.sources__list a:hover,
+.sources__page a:hover {
+  color: var(--brand);
+}
+
+.sources__author {
+  color: var(--muted-foreground);
+}
+
+.sources__note {
+  display: block;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.sources__page {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+}
+
+/* ══ Footer, three columns ══════════════════════════════════════════════════ */
+
+.site-foot__inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0.4rem 0 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.6rem;
+  text-align: left;
+}
+
+@media (min-width: 720px) {
+  .site-foot__inner {
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.site-foot__col {
+  min-width: 0;
+}
+
+.site-foot__col .site-foot__text + .site-foot__text {
+  margin-top: 0.35rem;
+}
+
+.site-foot__flag {
+  width: 6.5rem;
+  height: auto;
+  display: block;
+  margin-bottom: 0.7rem;
+}
+
+.site-foot__label {
+  padding-bottom: 0.45rem;
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.site-foot__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--muted-foreground);
+}
+
+.site-foot__col ul a {
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: var(--brand);
+  text-underline-offset: 3px;
+}
+
+.site-foot__col ul a:hover {
+  color: var(--brand);
+}
+
+/* ══ Tables ═════════════════════════════════════════════════════════════════ */
+
+/* The first column is the key, so it holds its weight. */
+.prose td:first-child {
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+/* A table whose header row is all blanks (a two-column "term | meaning" list
+   written as a table) shouldn't draw an empty strip. The first body row then
+   sits straight under the frame. */
+.prose thead:has(th:empty):not(:has(th:not(:empty))) {
+  display: none;
+}
+
+.prose thead:has(th:empty):not(:has(th:not(:empty))) + tbody tr:first-child td {
+  border-top: 0;
+}
+
+/* Four or more columns on a phone: rather than every cell wrapping a word per
+   line, the table keeps a readable width and the frame scrolls sideways. The
+   last column is usually the sentence, so it gets more. */
+.prose table:has(tr > td:nth-child(4)) td {
+  min-width: 7rem;
+}
+
+.prose table:has(tr > td:nth-child(4)) td:last-child {
+  min-width: 12rem;
+}

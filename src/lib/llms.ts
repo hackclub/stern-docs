@@ -17,7 +17,12 @@
  * needs to know whether the round it's advising someone about is still open.
  */
 
-import { loadProgramContent, type ProgramContent } from "@/lib/content";
+import {
+  loadProgramContent,
+  type Doc,
+  type ProgramContent,
+} from "@/lib/content";
+import { authorOf } from "@/lib/seo";
 import { fetchProgram, joinUrl, type Program } from "@/lib/program";
 import { archiveDate, describeSchedule, parseDate } from "@/lib/schedule";
 import { CONTENT_REPO, CONTENT_REPO_URL, SITE_URL } from "@/lib/site";
@@ -34,6 +39,23 @@ export const MARKDOWN_HEADERS = {
   ...TEXT_HEADERS,
   "Content-Type": "text/markdown; charset=utf-8",
 } as const;
+
+/**
+ * Who wrote a page and, when its text was copied, where from. Carried on every
+ * machine-readable surface so the credit can't be separated from the words.
+ */
+export function creditLines(doc: Doc, content: ProgramContent): string[] {
+  const author = doc.author ?? authorOf(content.config).name;
+  return [
+    `Author: ${author}`,
+    ...doc.sources.map(
+      (source) =>
+        `Copied from: ${source.label}${source.href ? ` <${source.href}>` : ""}${
+          source.author ? ` by ${source.author}` : ""
+        }${source.note ? ` (${source.note})` : ""}`,
+    ),
+  ];
+}
 
 /** URL of a page's raw markdown. Also what the "Copy as Markdown" button cites. */
 export function rawUrl(program: string, segments: string[]): string {
@@ -143,6 +165,7 @@ export async function buildFullText(
           `Page: ${doc.title}`,
           `URL: ${SITE_URL}${doc.href}`,
           `Source: ${doc.filePath}`,
+          ...creditLines(doc, content),
           "",
           doc.body,
         ].join("\n"),

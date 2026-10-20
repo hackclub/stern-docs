@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
-import { loadProgramContent } from "@/lib/content";
-import { fetchProgram } from "@/lib/program";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
+import { loadProgramContent, programName, type DocsConfig } from "@/lib/content";
+import { fetchProgram, type Program } from "@/lib/program";
 import {
   archiveDate,
   describeSchedule,
@@ -9,127 +11,276 @@ import {
 } from "@/lib/schedule";
 import { resolveThemeSeed } from "@/lib/seed";
 import { ogColors } from "@/lib/theme";
+import { HACK_CLUB_FLAG, SITE_URL } from "@/lib/site";
 
 export const OG_SIZE = { width: 1200, height: 630 };
+
+const ROOT = process.cwd();
+const FONT_DIR = path.join(ROOT, "src", "assets", "fonts");
+
+/**
+ * The same three Plex voices the page uses, read once per server the way the
+ * Next docs do it. satori can't load from Google Fonts, and a share card in a
+ * different typeface than the page it links to reads as somebody else's poster.
+ */
+const [condensed, mono, sans, flagSvg] = await Promise.all([
+  readFile(path.join(FONT_DIR, "IBMPlexSansCondensed-SemiBold.woff")),
+  readFile(path.join(FONT_DIR, "IBMPlexMono-Medium.woff")),
+  readFile(path.join(FONT_DIR, "IBMPlexSans-Regular.woff")),
+  readFile(path.join(ROOT, "public", HACK_CLUB_FLAG)),
+]);
+
+const FONTS = [
+  { name: "Plex Condensed", data: condensed, weight: 600 as const, style: "normal" as const },
+  { name: "Plex Mono", data: mono, weight: 500 as const, style: "normal" as const },
+  { name: "Plex Sans", data: sans, weight: 400 as const, style: "normal" as const },
+];
+
+const FLAG_SRC = `data:image/svg+xml;base64,${flagSvg.toString("base64")}`;
+
+/**
+ * A mark from public/, inlined. The card is rendered on the server, often at
+ * build time, where a URL back to this very site isn't reachable yet  so the
+ * file is read from disk and handed to satori as a data URI.
+ */
+async function localImage(publicPath: string | undefined): Promise<string | null> {
+  if (!publicPath || !publicPath.startsWith("/") || publicPath.includes("..")) {
+    return null;
+  }
+  try {
+    const data = await readFile(path.join(ROOT, "public", publicPath));
+    const type = publicPath.endsWith(".svg")
+      ? "image/svg+xml"
+      : publicPath.endsWith(".jpg") || publicPath.endsWith(".jpeg")
+        ? "image/jpeg"
+        : "image/png";
+    return `data:${type};base64,${data.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The round, in words a cached card can't be wrong about. An open round says
+ * when it closes, a finished one says it's an archive, and an unreachable stern
+ * says nothing at all  a card in Slack's image proxy may be days old, so it
+ * never carries a countdown, and it never claims a status it didn't read.
+ */
+function statusLine(data: Program | null): { text: string; live: boolean } | null {
+  if (!data) return null;
+  const start = parseDate(data.startsAt);
+  const end = parseDate(data.endsAt);
+  const schedule = describeSchedule(start, end, Date.now());
+
+  if (schedule.phase === "ended") {
+    const ran = [start ? shortDate(start) : null, end ? archiveDate(end) : null]
+      .filter(Boolean)
+      .join(" – ");
+    return { text: `Archive${ran ? ` · ran ${ran}` : ""}`, live: false };
+  }
+  if (schedule.phase === "upcoming") {
+    return { text: `Opens ${start ? shortDate(start) : "soon"}`, live: false };
+  }
+  return { text: end ? `Open · closes ${shortDate(end)}` : "Open", live: true };
+}
+
+export type OgCard = {
+  title: string;
+  description?: string | null;
+  /** The section the page sits in, for the eyebrow. */
+  section?: string | null;
+  /** Reserved: the page path. Not drawn, see the corner note below. */
+  path?: string;
+};
 
 /**
  * The share card.
  *
  * Same panel language as the site  brand seam across the top, silkscreen
- * labels, the program's logo  because a link dropped in a Slack channel is
- * often the first thing anyone sees of these docs, and it should read as the
- * program's own equipment.
- *
- * The status line follows the same rule as everything else: an open round says
- * when it closes, a finished one says it's an archive. A card cached in Slack's
- * image proxy can be stale, so it never carries a countdown, only dates.
+ * labels, the Hack Club flag and the program's own mark  because a link
+ * dropped in a Slack channel is often the first thing anyone sees of these
+ * docs, and it should read as the program's own equipment.
  */
-export async function docOgImage(program: string, title: string) {
+export async function docOgImage(program: string, card: OgCard) {
   const content = await loadProgramContent(program);
+  const config: DocsConfig = content?.config ?? { title: "Docs", groups: [] };
   const data = await fetchProgram(program);
-  const seed = await resolveThemeSeed(
-    data,
-    content?.config ?? { title: "Docs", groups: [] },
-  );
+  const seed = await resolveThemeSeed(data, config);
   const c = ogColors(seed);
 
-  const schedule = describeSchedule(
-    parseDate(data?.startsAt),
-    parseDate(data?.endsAt),
-    Date.now(),
-  );
-  const start = parseDate(data?.startsAt);
-  const end = parseDate(data?.endsAt);
+  const name = data?.name ?? programName(config);
+  const status = statusLine(data);
+  const wordmark = await localImage(config.brand?.wordmark);
+  const icon = await localImage(config.brand?.icon);
+  // stern's logo is a URL satori fetches itself; the local mark needs no network.
+  const mark = wordmark ?? data?.images.logo ?? icon;
+  const markIsWide = Boolean(wordmark);
 
-  const status =
-    schedule.phase === "ended"
-      ? `ARCHIVE · RAN ${start ? shortDate(start).toUpperCase() : ""}${end ? `–${archiveDate(end).toUpperCase()}` : ""}`
-      : schedule.phase === "upcoming"
-        ? `OPENS ${start ? shortDate(start).toUpperCase() : "SOON"}`
-        : end
-          ? `OPEN · CLOSES ${shortDate(end).toUpperCase()}`
-          : "OPEN";
-
-  const label = `${data?.name ?? content?.config.title ?? program} docs`;
+  // The wordmark already says whose docs these are; the eyebrow says where in
+  // them. Without a local wordmark the program name has to carry that itself.
+  const eyebrow = wordmark ? (card.section ?? "") : `${name} docs`;
+  const title = card.title;
+  const titleSize = title.length > 44 ? 64 : title.length > 28 ? 76 : 92;
+  const host = SITE_URL.replace(/^https?:\/\//, "");
 
   return new ImageResponse(
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        background: c.background,
-        padding: "72px 76px",
-        fontFamily: "sans-serif",
-        position: "relative",
-      }}
-    >
-      {/* Brand seam  the one piece of color, top edge, like the site. */}
+    (
       <div
         style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 8,
-          background: `linear-gradient(90deg, ${c.brand}, ${c.brand2})`,
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          background: c.background,
+          padding: "60px 72px 56px",
+          fontFamily: "Plex Sans",
+          position: "relative",
         }}
-      />
-
-      <div style={{ display: "flex", alignItems: "center" }}>
-        {data?.images.logo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={data.images.logo}
-            alt=""
-            width={64}
-            height={64}
-            style={{ marginRight: 22, objectFit: "contain" }}
-          />
-        ) : null}
+      >
+        {/* Brand seam  the one piece of colour, top edge, like the site. */}
         <div
           style={{
-            color: c.muted,
-            fontSize: 26,
-            letterSpacing: 6,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 10,
+            background: `linear-gradient(90deg, ${c.brand} 0%, ${c.brand2} 60%, ${c.background} 100%)`,
+          }}
+        />
+        {/* Rack units: the faint ruled grid the page body also sits on. */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: `linear-gradient(${c.hairline} 1px, transparent 1px)`,
+            backgroundSize: "100% 28px",
+            opacity: 0.45,
+          }}
+        />
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={FLAG_SRC}
+              alt=""
+              width={120}
+              height={42}
+              style={{ marginRight: 26 }}
+            />
+            {eyebrow ? (
+              <div
+                style={{
+                  fontFamily: "Plex Mono",
+                  color: c.muted,
+                  fontSize: 22,
+                  letterSpacing: 5,
+                  textTransform: "uppercase",
+                }}
+              >
+                {eyebrow}
+              </div>
+            ) : null}
+          </div>
+          {mark ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={mark}
+              alt=""
+              width={markIsWide ? 240 : 72}
+              height={markIsWide ? 90 : 72}
+              style={{ objectFit: "contain" }}
+            />
+          ) : null}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            flexGrow: 1,
+            paddingTop: 24,
+            paddingBottom: 24,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              fontFamily: "Plex Condensed",
+              fontSize: titleSize,
+              lineHeight: 1.02,
+              color: c.foreground,
+              fontWeight: 600,
+              letterSpacing: -1.5,
+              maxWidth: 1000,
+            }}
+          >
+            {title}
+          </div>
+          {card.description ? (
+            <div
+              style={{
+                display: "flex",
+                marginTop: 22,
+                fontSize: 28,
+                lineHeight: 1.35,
+                color: c.muted,
+                maxWidth: 940,
+              }}
+            >
+              {card.description.length > 150
+                ? `${card.description.slice(0, 147).trimEnd()}…`
+                : card.description}
+            </div>
+          ) : null}
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            fontFamily: "Plex Mono",
+            fontSize: 22,
+            letterSpacing: 3,
             textTransform: "uppercase",
           }}
         >
-          {label}
+          <div style={{ display: "flex", alignItems: "center", color: c.brand }}>
+            {status ? (
+              <>
+                <div
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: 7,
+                    background: status.live ? c.brand : c.hairline,
+                    boxShadow: status.live ? `0 0 0 5px ${c.brand}33` : "none",
+                    marginRight: 16,
+                  }}
+                />
+                {status.text}
+              </>
+            ) : null}
+          </div>
+          {/* The docs home, not the page path: a long slug wraps into the
+              status line. One string, not two text nodes, because satori wants
+              explicit flex for anything with more than one child. */}
+          <div style={{ color: c.muted, flexShrink: 0, marginLeft: 32 }}>
+            {`${host}/${program}`}
+          </div>
         </div>
       </div>
-
-      <div
-        style={{
-          display: "flex",
-          fontSize: title.length > 42 ? 76 : 96,
-          lineHeight: 1.05,
-          color: c.foreground,
-          fontWeight: 600,
-          letterSpacing: -2,
-          maxWidth: 1000,
-        }}
-      >
-        {title}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <div
-          style={{
-            width: 14,
-            height: 14,
-            borderRadius: 7,
-            background: schedule.phase === "ended" ? c.hairline : c.brand,
-            marginRight: 16,
-          }}
-        />
-        <div style={{ color: c.brand, fontSize: 24, letterSpacing: 4 }}>
-          {status}
-        </div>
-      </div>
-    </div>,
-    OG_SIZE,
+    ),
+    { ...OG_SIZE, fonts: FONTS },
   );
 }

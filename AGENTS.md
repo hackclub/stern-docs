@@ -31,3 +31,46 @@ Do write:
 When a page needs prose, leave the heading and a `TODO:` line under it, and say
 in your reply which sections need writing. Verbatim text moved between files is
 a move, not writing, and is fine.
+
+# No generated text. Ever.
+
+Every sentence a reader can see on this site was either typed by a named
+person or copied, unchanged, from a source that is named next to it. There is
+no third category. "Lightly edited", "summarised", "polished" and "rephrased"
+are all generated text and are not allowed.
+
+This covers everything a person can read, not only `content/`:
+
+- Page bodies, `title`, `description`, `tagline`, `blurb`, `label` values
+- `docs.json`, `README.md`, `AGENTS.md`, PR and issue bodies, commit messages
+- Strings in `src/` longer than a label. A button or heading of a few words is
+  a label; a sentence is prose and needs a human to write it
+
+How text gets in:
+
+1. **A person writes it** and is named. The site falls back to
+   `NEXT_PUBLIC_AUTHOR_NAME`; a page can override with `author:` in its
+   frontmatter.
+2. **It is copied verbatim** from a public source and credited in the page's
+   frontmatter. The site renders the credit at the foot of the page, in
+   `/raw/…` and in `/llms-full.txt`:
+
+   ```yaml
+   author: Archer
+   sources:
+     - label: cloudfall.hackclub.com, "How it works"
+       href: https://cloudfall.hackclub.com/#how
+       author: Archer
+       note: Copied verbatim from src/lib/data.js in AD-Archer/cloudFALL
+   ```
+
+   Verbatim means verbatim: keep the typos. Reformatting (a list into a
+   table, a heading level) is fine; changing words is not. If a copied
+   passage needs a different sentence, leave a `TODO:` for a person.
+
+Agents: never produce a candidate sentence "for a human to review". The
+review never happens and the sentence ships. Write the structure, write the
+code, leave the `TODO:`, and say in the reply which lines need a person.
+
+`pnpm check:content` runs in CI and fails on malformed credits, unknown
+`group` ids, and any spelling of the organisation other than "Hack Club".
