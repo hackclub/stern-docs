@@ -3,6 +3,10 @@ title: Submitting your project
 description: Read this before you submit please.
 group: ship
 order: 2
+related:
+  - review
+  - packaging
+  - devlogs-and-hours
 ---
 
 Submissions go through the program's own pages on stern. The join button in the

@@ -3,6 +3,9 @@ title: Devlogs and hours
 description: How time gets counted, what a devlog is for, and how to keep the two lined up.
 group: ship
 order: 1
+related:
+  - getting-started
+  - submitting
 ---
 
 Software hours come from Hackatime, unfortantely we run into situations where we can't use hackatime. That's what devlogs are for.

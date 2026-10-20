@@ -72,6 +72,23 @@ async function checkFrontmatter() {
   }
 
   const files = await walk(CONTENT, (name) => name.endsWith(".md"));
+
+  // Every page's href, per program, so `related:` can be checked. Shared pages
+  // exist under every program.
+  const hrefOf = (file) => {
+    const rel = path.relative(CONTENT, file).split(path.sep);
+    const program = rel[0];
+    const parts = rel.slice(1);
+    const last = parts[parts.length - 1].replace(/\.md$/, "");
+    const segments = last === "index" ? parts.slice(0, -1) : [...parts.slice(0, -1), last];
+    return { program, path: segments.join("/") };
+  };
+  const pages = files.map(hrefOf);
+  const exists = (program, href) => {
+    const target = href.startsWith("/") ? href.replace(/^\/[^/]+\/?/, "") : href.replace(/^\/+/, "");
+    return pages.some((p) => (p.program === program || p.program.startsWith("_")) && p.path === target);
+  };
+
   for (const file of files) {
     const raw = await fs.readFile(file, "utf8");
     let parsed;
@@ -100,6 +117,15 @@ async function checkFrontmatter() {
     if (data.author !== undefined && typeof data.author !== "string") {
       fail(file, 1, "`author` must be a name");
     }
+    if (data.synced !== undefined) {
+      const iso = data.synced instanceof Date ? data.synced.toISOString().slice(0, 10) : data.synced;
+      if (typeof iso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+        fail(file, 1, "`synced` must be a YYYY-MM-DD date");
+      }
+      if (!Array.isArray(data.sources) || data.sources.length === 0) {
+        fail(file, 1, "a synced page must list the `sources` it was copied from");
+      }
+    }
     if (
       typeof data.group === "string" &&
       groups &&
@@ -111,6 +137,25 @@ async function checkFrontmatter() {
         1,
         `group "${data.group}" is not an id in docs.json (${[...groups].join(", ")})`,
       );
+    }
+
+    if (data.related !== undefined) {
+      if (!Array.isArray(data.related)) {
+        fail(file, 1, "`related` must be a list of page paths");
+      } else {
+        const program = path.relative(CONTENT, file).split(path.sep)[0];
+        for (const href of data.related) {
+          if (typeof href !== "string") { fail(file, 1, "`related` entries must be strings"); continue; }
+          if (!program.startsWith("_") && !exists(program, href)) {
+            fail(file, 1, `related page not found: ${href}`);
+          }
+        }
+      }
+    }
+    if (data.tags !== undefined) {
+      if (!Array.isArray(data.tags) || data.tags.some((t) => typeof t !== "string" || !t.trim())) {
+        fail(file, 1, "`tags` must be a list of words");
+      }
     }
 
     if (data.sources !== undefined) {

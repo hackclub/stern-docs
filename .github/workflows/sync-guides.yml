@@ -1,0 +1,54 @@
+name: Sync guides
+
+# The guide pages are copied text, regenerated from their upstream sources by
+# scripts/sync-guides.mjs. This reruns it weekly and opens a pull request with
+# whatever upstream changed, so a person reviews the diff before it ships and
+# nobody ever edits the copied words by hand. Nothing lands on main from here.
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays, 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Regenerate guides from upstream
+        run: pnpm sync:guides
+        env:
+          # Lets the script read branch heads from the GitHub API without
+          # hitting the anonymous rate limit.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: pnpm check:content
+
+      - name: Open a pull request with the changes
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: sync/guides
+          delete-branch: true
+          commit-message: "Sync guides from upstream sources"
+          title: "Sync guides from upstream sources"
+          body: |
+            `scripts/sync-guides.mjs` found changes in one or more upstream
+            sources. The diff is the upstream change, copied verbatim; the
+            `sources:` block on each page names the revision it came from.
+
+            Review the text as its authors wrote it. Do not edit the words
+            here; fix a recipe in the script instead if a section is wrong.
+          labels: content

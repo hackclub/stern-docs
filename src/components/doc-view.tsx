@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { OnThisPage } from "@/components/on-this-page";
 import { PageActions } from "@/components/page-actions";
 import { Pager } from "@/components/pager";
@@ -5,6 +6,8 @@ import { Sources } from "@/components/sources";
 import {
   editUrl,
   neighbours,
+  relatedDocs,
+  tagHref,
   type Doc,
   type ProgramContent,
 } from "@/lib/content";
@@ -40,6 +43,7 @@ export async function DocView({
   const group = content.nav.find((entry) => entry.id === doc.group);
   const section = group?.label;
   const siteAuthor = authorOf(content.config);
+  const related = relatedDocs(content, doc);
   const canonical = `${SITE_URL}${doc.href}`;
   const isHome = doc.segments.length === 0;
 
@@ -98,16 +102,53 @@ export async function DocView({
           {doc.description ? (
             <p className="doc-lede">{doc.description}</p>
           ) : null}
+          {doc.tags.length > 0 ? (
+            // Topics, each a link to every page on that topic. The way from
+            // "I want the movies one" to the movies one, without the rail.
+            <ul className="tags" aria-label="Topics">
+              {doc.tags.map((tag) => (
+                <li key={tag}>
+                  <Link className="tag" href={tagHref(content.program, tag)}>
+                    {tag}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : null}
         </header>
 
         <div className="prose" dangerouslySetInnerHTML={{ __html: html }} />
 
         {children}
 
+        {related.length > 0 ? (
+          <section className="related panel" aria-labelledby="related-title">
+            <h2 id="related-title" className="silkscreen">
+              Related
+            </h2>
+            <ul>
+              {related.map((target) => (
+                <li key={target.href}>
+                  <Link className="section-link" href={target.href}>
+                    <span className="led" aria-hidden />
+                    <span>
+                      <span className="section-link__title">{target.title}</span>
+                      {target.description ? (
+                        <span className="section-link__desc">{target.description}</span>
+                      ) : null}
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
         <Sources
           author={doc.author ?? siteAuthor.name}
           authorHref={doc.author ? null : siteAuthor.url}
           sources={doc.sources}
+          synced={doc.synced}
         />
 
         <PageActions

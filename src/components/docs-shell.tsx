@@ -7,7 +7,13 @@ import { useState } from "react";
 import { DocSearch, type SearchEntry } from "@/components/doc-search";
 
 export type RailDoc = { href: string; title: string };
-export type RailGroup = { id: string; label: string; docs: RailDoc[] };
+export type RailGroup = {
+  id: string;
+  label: string;
+  /** Folded until opened, unless the current page is inside. */
+  collapsed?: boolean;
+  docs: RailDoc[];
+};
 
 export type DocsShellProps = {
   title: string;
@@ -139,9 +145,9 @@ export function DocsShell({
           {panel}
 
           <nav aria-label="Documentation">
-            {groups.map((group) => (
-              <div className="rail-group" key={group.id}>
-                <h3 className="silkscreen rail-group__label">{group.label}</h3>
+            {groups.map((group) => {
+              const inside = group.docs.some((doc) => isActive(doc.href));
+              const ports = (
                 <ul>
                   {group.docs.map((doc) => (
                     <li key={doc.href}>
@@ -164,8 +170,30 @@ export function DocsShell({
                     </li>
                   ))}
                 </ul>
-              </div>
-            ))}
+              );
+              // A category folds; a path stays open. Native <details>, so it
+              // works before hydration and remembers nothing it shouldn't.
+              return group.collapsed ? (
+                <details
+                  className="rail-group rail-group--folding"
+                  key={group.id}
+                  open={inside || undefined}
+                >
+                  <summary className="silkscreen rail-group__label">
+                    <span>{group.label}</span>
+                    <span className="rail-group__count tabular" aria-hidden>
+                      {group.docs.length}
+                    </span>
+                  </summary>
+                  {ports}
+                </details>
+              ) : (
+                <div className="rail-group" key={group.id}>
+                  <h3 className="silkscreen rail-group__label">{group.label}</h3>
+                  {ports}
+                </div>
+              );
+            })}
           </nav>
 
           {links.length > 0 ? (

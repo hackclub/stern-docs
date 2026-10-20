@@ -52,8 +52,12 @@ export type DocsConfig = {
   title: string;
   /** One line under the title in the sidebar. */
   tagline?: string;
-  /** Sections, in the order they appear. A doc's `group` matches an `id`. */
-  groups: { id: string; label: string; blurb?: string }[];
+  /**
+   * Sections, in the order they appear. A doc's `group` matches an `id`.
+   * `collapsed` folds the section in the contents rail until a reader opens
+   * it or is on a page inside it; for a category of guides, not a path.
+   */
+  groups: { id: string; label: string; blurb?: string; collapsed?: boolean }[];
   /**
    * Colors. Omit the whole block and the program's `accentColor` from stern
    * drives the palette, with its artwork supplying the companion hue.
@@ -126,6 +130,19 @@ export type Doc = {
   author: string | null;
   /** Credited sources for copied text. Empty for a page written here. */
   sources: DocSource[];
+  /**
+   * ISO date the page was last regenerated from its sources, set by
+   * scripts/sync-guides.mjs. Null for a page a person wrote.
+   */
+  synced: string | null;
+  /**
+   * Other pages worth reading next, as hrefs. "/cloudfall/guides/jellyfin"
+   * or, for a page that should work under any program, "guides/jellyfin".
+   * Rendered as a Related panel with each target's own title and lede.
+   */
+  related: string[];
+  /** Topics, lowercase: "movies", "games". Each one is a page under /tag/. */
+  tags: string[];
   /** Raw markdown body, frontmatter stripped. */
   body: string;
   /** Repo-relative path, for the "Edit this page" link. */
@@ -136,6 +153,7 @@ export type NavGroup = {
   id: string;
   label: string;
   blurb?: string;
+  collapsed?: boolean;
   docs: Doc[];
 };
 
@@ -193,6 +211,23 @@ const titleize = (slug: string) =>
 
 const optionalString = (value: unknown): string | null =>
   typeof value === "string" && value.trim() !== "" ? value.trim() : null;
+
+const stringList = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((v): v is string => typeof v === "string" && v.trim() !== "").map((v) => v.trim())
+    : [];
+
+/** "Movies", " movies ", "movies" are one tag, and one URL. */
+export const normalizeTag = (tag: string) =>
+  tag.trim().toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+
+/** A related href may be site-absolute or program-relative. */
+const absoluteHref = (program: string, href: string) =>
+  href.startsWith("/") ? href : `/${program}/${href.replace(/^\/+/, "")}`;
+
+/** Where a tag's listing lives. */
+export const tagHref = (program: string, tag: string) =>
+  `/${program}/tag/${encodeURIComponent(normalizeTag(tag))}`;
 
 /**
  * `sources:` is a list; anything without a `label` is dropped rather than
@@ -252,7 +287,10 @@ function parseDoc(
     order: typeof data.order === "number" ? data.order : 999,
     hidden: data.hidden === true,
     author: optionalString(data.author),
+    related: stringList(data.related).map((href) => absoluteHref(program, href)),
+    tags: Array.from(new Set(stringList(data.tags).map(normalizeTag).filter(Boolean))),
     sources: parseSources(data.sources),
+    synced: optionalString(data.synced instanceof Date ? data.synced.toISOString().slice(0, 10) : data.synced),
     body: parsed.content.trim(),
     filePath: ["content", ...path.relative(CONTENT_ROOT, absolute).split(path.sep)].join(
       "/",
@@ -347,6 +385,24 @@ export async function loadProgramContent(
   return { program, config, docs, nav, flat };
 }
 
+/** Every tag in use, with the visible pages that carry it, most used first. */
+export function tagIndex(content: ProgramContent): { tag: string; docs: Doc[] }[] {
+  const byTag = new Map<string, Doc[]>();
+  for (const doc of content.docs) {
+    if (doc.hidden) continue;
+    for (const tag of doc.tags) byTag.set(tag, [...(byTag.get(tag) ?? []), doc]);
+  }
+  return Array.from(byTag, ([tag, docs]) => ({ tag, docs }))
+    .sort((a, b) => b.docs.length - a.docs.length || a.tag.localeCompare(b.tag));
+}
+
+/** The pages a doc points to as related, in the order it listed them. */
+export function relatedDocs(content: ProgramContent, doc: Doc): Doc[] {
+  return doc.related
+    .map((href) => content.docs.find((candidate) => candidate.href === href))
+    .filter((candidate): candidate is Doc => candidate != null && !candidate.hidden);
+}
+
 export function findDoc(
   content: ProgramContent,
   segments: string[],
@@ -383,7 +439,10 @@ export function editUrl(
   const repo = config.repo || fallbackRepo;
   if (!repo) return null;
   const branch = config.branch || fallbackBranch;
-  return `https://github.com/${repo}/edit/${branch}/${doc.filePath}`;
+  // A synced page is regenerated from upstream; an edit to its words would be
+  // overwritten on the next run. The thing to edit is its recipe.
+  const file = doc.synced ? "scripts/sync-guides.mjs" : doc.filePath;
+  return `https://github.com/${repo}/edit/${branch}/${file}`;
 }
 
 /** The program's short name: "CloudFALL docs" → "CloudFALL". */

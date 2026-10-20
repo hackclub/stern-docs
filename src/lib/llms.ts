@@ -58,6 +58,7 @@ export function creditLines(doc: Doc, content: ProgramContent): string[] {
   const author = doc.author ?? authorOf(content.config).name;
   return [
     `Author: ${author}`,
+    ...(doc.synced ? [`Synced from sources: ${doc.synced} (scripts/sync-guides.mjs)`] : []),
     ...doc.sources.map(
       (source) =>
         `Copied from: ${source.label}${source.href ? ` <${source.href}>` : ""}${

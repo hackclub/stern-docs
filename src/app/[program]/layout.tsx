@@ -174,6 +174,7 @@ export default async function ProgramLayout({
         groups={content.nav.map((group) => ({
           id: group.id,
           label: group.label,
+          collapsed: group.collapsed === true,
           docs: group.docs.map((doc) => ({ href: doc.href, title: doc.title })),
         }))}
         links={links}
@@ -184,6 +185,7 @@ export default async function ProgramLayout({
             title: doc.title,
             description: doc.description,
             group: doc.group,
+            tags: doc.tags,
             text: plainText(doc.body).slice(0, SEARCH_TEXT_LIMIT),
           }))}
         status={

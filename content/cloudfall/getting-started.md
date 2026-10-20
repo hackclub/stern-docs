@@ -3,6 +3,9 @@ title: Getting started
 description: Two accounts, one plugin, and the Slack channel. Fifteen minutes, once.
 group: start
 order: 1
+related:
+  - pick-a-project
+  - devlogs-and-hours
 ---
 
 Do this before you write any code. The hours you work before Hackatime/Lapse is

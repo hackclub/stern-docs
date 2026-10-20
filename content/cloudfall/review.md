@@ -3,6 +3,9 @@ title: What reviewers check
 description: I don't have a creative thing to put here, maybe you submit a pull request
 group: ship
 order: 3
+related:
+  - submitting
+  - packaging
 ---
 
 Six checks, every submission. Miss one and it comes back with notes; fix it and

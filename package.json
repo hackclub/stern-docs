@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "sync:guides": "node scripts/sync-guides.mjs"
   },
   "packageManager": "pnpm@10.26.1",
   "engines": {

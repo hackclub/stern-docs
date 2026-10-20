@@ -1,0 +1,104 @@
+---
+title: "Hardlinks and Instant Moves (Atomic-Moves)"
+description: "If you’re wondering why hardlinks aren’t working or why a simple move is taking far longer than it should."
+group: learn
+order: 6
+tags: [torrents, storage]
+related:
+  - guides/bittorrent
+  - guides/jellyfin
+  - guides/persisting-container-data
+synced: "2026-10-20"
+sources:
+  - label: "TRaSH Guides, \"Hardlinks and Instant Moves (Atomic-Moves)\""
+    href: "https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/"
+    author: "TRaSH-Guides contributors, MIT"
+    note: "Copied verbatim; collapsible boxes rendered as callouts, links made absolute. Upstream commit 529bd9c."
+---
+
+## Description
+
+> [!NOTE]
+> If you’re wondering why hardlinks aren’t working or why a simple move is taking far longer than it should.
+>
+> Here we will try to explain it.
+
+This guide consists of 4 sections.
+
+1. This page with a short description.
+2. [How to set up](https://trash-guides.info/File-and-Folder-Structure/How-to-set-up/) for your installation method.
+3. [Examples](https://trash-guides.info/File-and-Folder-Structure/Examples/) What you should use for your path settings in your used applications.
+4. [Check if hardlinks are working](https://trash-guides.info/File-and-Folder-Structure/Check-if-hardlinks-are-working/)
+
+So you want one of the following?
+
+- Instant moves (Atomic-Moves) during import of the Starr Apps (useful when using Usenet)?
+- You don't want to use twice the storage when using torrents. (hardlinks)?
+- You want to perma-seed?
+
+Then Continue to [How to set up](https://trash-guides.info/File-and-Folder-Structure/How-to-set-up/) for your installation method.
+
+## FAQ
+
+### Hardlinks Limitations
+
+> [!CAUTION]
+> - You CAN'T create hardlinks for directories
+> - You CAN'T hardlink across separate file systems, partitions, volumes or mounts
+> - Some file systems, such as exFAT, are known not to support hardlinks and should be avoided (double-check if you are unsure!).
+
+### What are Hardlinks
+
+> [!NOTE]
+> **What are hardlinks?**
+> - [**Short answer**] Having a file in multiple locations without using double your storage space.
+> - [**Long answer**] Hardlinks allow a copy operation to be instant and not consume space for those additional copies.
+>
+>     Every file is a hardlink: some metadata that points at blocks on the file system, **which is why they're restricted to the same file system**. There can be as many metadata files pointing at those blocks as needed, and the blocks know how many links point to them. Once the blocks have 0 links, they're considered deleted.
+>
+>     This means:
+>
+>     - You can delete any "copy" without impacting other instances (hardlinks).
+>
+>         Your download client can remove its "copy" without impacting the library "copy". The library "copy" can also be removed by Plex, Sonarr/Radarr, or manually without impacting your download client's "copy".
+>
+>     - Space is only reclaimed once all "copies" of hardlinked data are deleted.
+>
+>     - Modifying any copy of a hardlinked file will impact all "copies".
+>
+>         For example, modifying the id3 tags of a .mp3 download after import would change the download client "copy", breaking the torrent.
+>
+>     [More info from Wikipedia, the free encyclopedia](https://en.wikipedia.org/wiki/Hard_link)
+>
+> > [!WARNING]
+> > **Don't forget to read the [Hardlinks limitations](https://trash-guides.info/File-and-Folder-Structure/Hardlinks-and-Instant-Moves/#hardlinks-limitations)**
+
+### What are Instant Moves (Atomic Moves)
+
+> [!NOTE]
+> **What are Instant Moves (Atomic Moves)?**
+> This is a real move, not a copying of a file from the download folder to the media folder and then deleting the file from the download folder.
+
+### What are the Starr Apps
+
+> [!NOTE]
+> **What are the `Starr Apps`?**
+> Sonarr, Radarr, Lidarr, etc.
+
+### Permissions, ownership, and UMASK
+
+> [!NOTE]
+> **Permissions, ownership, and UMASK**
+> Hardlinks and instant (atomic) moves require all paths to be on **one filesystem**, but they also depend on **permissions**: every app must be able to read — and the apps that import, upgrade, or delete must be able to write — each other's files. This is governed by the **user and group your apps run as**, the **`UMASK`**, and **ownership** — assumed knowledge here and explained in detail in the [Servarr Docker Guide](https://wiki.servarr.com/docker-guide).
+>
+> How the user and group are set depends on the image: many images (for example LinuxServer.io) use the `PUID` and `PGID` environment variables, while others use Docker's native `--user` / `user:` directive (a `uid:gid` pair). Either way, pick one of the two setups below and apply it consistently:
+>
+> | Setup | Users | `UMASK` | Resulting default permissions |
+> | --- | --- | --- | --- |
+> | **Per-app user + shared group** (recommended) | a separate user per app, all in one shared group | `002` | folders `775` (`drwxrwxr-x`), files `664` (`-rw-rw-r--`) |
+> | **Single shared user** (simpler, less strict) | one user for every app | `022` | folders `755` (`drwxr-xr-x`), files `644` (`-rw-r--r--`) |
+>
+> `UMASK 002` keeps the **group-write** bit, so files and folders created by one app can be read and written by the others. The single-user setup can use `022` because one user owns everything.
+>
+> > [!WARNING]
+> > Don't use `UMASK 000` (folders `777`, files `666`) — it makes everything readable and writable by **everyone**, which is poor Linux hygiene.

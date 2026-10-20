@@ -3,6 +3,14 @@ title: Pick a project
 description: Find something you pay for and build a replacement
 group: start
 order: 2
+tags: [ideas, movies, music, photos, files, games]
+related:
+  - what-you-pay-for
+  - guides/jellyfin
+  - guides/navidrome
+  - guides/immich
+  - guides/syncthing
+  - guides/minecraft-server
 ---
 
 The strongest CloudFALL submissions will start with something specific: a service, a
@@ -12,10 +20,10 @@ price, a month. For example "The $17.99 I pay Netflix, but I have dvds at home" 
 
 | You pay for   | Runs instead | Port | What you actually get                                                                                     |
 | ------------- | ------------ | ---- | --------------------------------------------------------------------------------------------------------- |
-| Netflix       | Jellyfin     | 8096 | Rip the discs you own, stream them to every screen in the house like netflix.                             |
-| Spotify       | Navidrome    | 4533 | High quality music for free, with no ads that you own forever.                                            |
-| Google Photos | Immich       | 2283 | Automated backups for all of your photos but you don't owe google $25/M for the rest of time.             |
-| iCloud+       | Syncthing    | 8384 | Every photo and backup your phone makes on every device you own                                           |
+| Netflix       | [Jellyfin](/cloudfall/guides/jellyfin)     | 8096 | Rip the discs you own, stream them to every screen in the house like netflix.                             |
+| Spotify       | [Navidrome](/cloudfall/guides/navidrome)    | 4533 | High quality music for free, with no ads that you own forever.                                            |
+| Google Photos | [Immich](/cloudfall/guides/immich)       | 2283 | Automated backups for all of your photos but you don't owe google $25/M for the rest of time.             |
+| iCloud+       | [Syncthing](/cloudfall/guides/syncthing)    | 8384 | Every photo and backup your phone makes on every device you own                                           |
 
 That table is a starting point. The test is in
 [what reviewers check](/cloudfall/review): does it replace something proprietary(privately owned)

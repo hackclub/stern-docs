@@ -121,6 +121,22 @@ a model must not do with these docs is invite someone into a round that has ende
 In the UI, the same content is one click away: **Copy as Markdown** at the foot of
 every page copies that page's source, and **View source** opens `/raw/…`.
 
+## Synced guides
+
+`content/cloudfall/guides/` is copied text, never edited by hand. Each page's
+recipe lives in [`scripts/sync-guides.mjs`](scripts/sync-guides.mjs):
+
+```bash
+pnpm sync:guides            # rewrite pages whose upstream text changed
+pnpm sync:guides --check    # exit 1 if any page is stale, write nothing
+```
+
+| What                                | Where                                                |
+| ----------------------------------- | ---------------------------------------------------- |
+| Source, licence, revision per page  | `sources:` frontmatter, rendered at the foot of the page |
+| Last regenerated                    | `synced:` frontmatter                                |
+| Weekly rerun, opens a pull request  | [`.github/workflows/sync-guides.yml`](.github/workflows/sync-guides.yml) |
+
 ## Adding a program
 
 ```bash

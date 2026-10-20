@@ -9,6 +9,9 @@ sources:
     href: https://cloudfall.hackclub.com/#how
     author: Archer
     note: Copied verbatim from src/App.svelte and src/lib/data.js (MOVES, FINE_PRINT, TERMS) in AD-Archer/cloudFALL
+related:
+  - getting-started
+  - what-you-pay-for
 ---
 
 ## 1. Pick

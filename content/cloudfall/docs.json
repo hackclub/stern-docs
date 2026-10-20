@@ -32,6 +32,31 @@
       "blurb": "The four things nobody tells you about running your own box."
     },
     {
+      "id": "learn",
+      "label": "Never run a server before?",
+      "collapsed": true
+    },
+    {
+      "id": "watch",
+      "label": "Watching",
+      "collapsed": true
+    },
+    {
+      "id": "listen",
+      "label": "Listening",
+      "collapsed": true
+    },
+    {
+      "id": "store",
+      "label": "Photos & files",
+      "collapsed": true
+    },
+    {
+      "id": "else",
+      "label": "Everything else",
+      "collapsed": true
+    },
+    {
       "id": "ship",
       "label": "Ship it",
       "blurb": "What a submission needs, and what a reviewer looks at."

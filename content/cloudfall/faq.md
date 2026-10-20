@@ -3,6 +3,10 @@ title: FAQ
 description: The questions that come up most in the channel.
 group: help
 order: 1
+related:
+  - guides/self-hosting
+  - self-hosting-basics
+  - review
 ---
 
 ## Do I need to own a server?

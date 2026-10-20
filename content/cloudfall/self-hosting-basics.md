@@ -3,6 +3,14 @@ title: Self-hosting basics
 description: How to create your own cloud at home
 group: build
 order: 1
+tags: [docker, server, backups, vpn]
+related:
+  - guides/self-hosting
+  - guides/what-is-a-container
+  - guides/how-compose-works
+  - guides/persisting-container-data
+  - guides/jellyfin
+  - packaging
 ---
 
 Creating your own server isn't hard, a server is a computer that gives(serves) data to other computers(clients). All you need to do to create a server is have a computer that can share data to another computer. This can be a Pi, old desktop or even a chromebook.

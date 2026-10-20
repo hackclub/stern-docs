@@ -4,7 +4,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DocView } from "@/components/doc-view";
 import { Horizon } from "@/components/horizon";
-import { findDoc, loadProgramContent, programName } from "@/lib/content";
+import {
+  findDoc,
+  loadProgramContent,
+  programName,
+  tagHref,
+  tagIndex,
+} from "@/lib/content";
 import { jsonLd, websiteJsonLd } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
@@ -56,6 +62,7 @@ export default async function ProgramHome({ params }: Params) {
 
   // The sky: the program's wordmark on a pale band of its own colour, closed
   // by a hand-drawn horizon where the paper starts. The art is drawn as drawn.
+  const topics = tagIndex(content);
   const brand = content.config.brand;
   const art = brand?.wordmark ? (
     <div className="sky">
@@ -113,6 +120,27 @@ export default async function ProgramHome({ params }: Params) {
             </section>
           ))}
         </div>
+
+        {topics.length > 0 ? (
+          // Every topic any page claimed, biggest first: the cross-cut through
+          // the sections above for someone who knows what they want, not where
+          // it was filed.
+          <section className="topics" aria-labelledby="topics-title">
+            <h2 id="topics-title" className="silkscreen">
+              Topics
+            </h2>
+            <ul className="tags tags--all">
+              {topics.map(({ tag, docs }) => (
+                <li key={tag}>
+                  <Link className="tag" href={tagHref(program, tag)}>
+                    {tag}
+                    <span className="tag__count tabular">{docs.length}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </DocView>
     </>
   );

@@ -3,6 +3,12 @@ title: Package it so it runs
 description: A reviewer has to be able to start your project. What "it runs" means in practice, and the docker-compose file that proves it.
 group: build
 order: 2
+tags: [docker, readme, licence]
+related:
+  - guides/what-is-a-container
+  - guides/how-compose-works
+  - self-hosting-basics
+  - submitting
 ---
 
 Every submission has to be something a reviewer can open and use. For a website

@@ -1621,3 +1621,126 @@ html[data-nav="0"] .site-bar {
 .prose table:has(tr > td:nth-child(4)) td:last-child {
   min-width: 12rem;
 }
+
+.sources__synced {
+  margin: 0.6rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+
+.sources__synced a {
+  text-decoration: underline;
+  text-decoration-color: var(--brand);
+  text-underline-offset: 3px;
+}
+
+/* ══ Folding categories in the rail ═════════════════════════════════════════ */
+
+/* A category of guides folds; the paths (start, build, ship) never do. The
+   summary keeps the silkscreen label and adds a count and a chevron, so a
+   folded section still says how much is inside. */
+.rail-group--folding > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.rail-group--folding > summary::-webkit-details-marker {
+  display: none;
+}
+
+.rail-group--folding > summary::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 140ms ease;
+  flex: none;
+}
+
+.rail-group--folding[open] > summary::before {
+  transform: rotate(45deg);
+}
+
+.rail-group--folding > summary:hover {
+  color: var(--foreground);
+}
+
+.rail-group__count {
+  margin-left: auto;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.rail-group--folding > ul {
+  margin-top: 0.1rem;
+}
+
+/* ══ Topics and related pages ═══════════════════════════════════════════════ */
+
+/* A tag is a port label you can press: same mono, same case, a hairline
+   frame. Under the lede it says what a page is about; on the home and the
+   tag pages it is the index. */
+.tags {
+  list-style: none;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  border: 1px solid var(--hairline);
+  border-radius: 2px;
+  padding: 0.22rem 0.5rem;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.tag:hover {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+.tag__count {
+  font-size: 0.66rem;
+  letter-spacing: 0;
+  opacity: 0.7;
+}
+
+.tags--all {
+  margin-top: 0.75rem;
+}
+
+.topics {
+  margin-top: 2rem;
+}
+
+.related {
+  margin-top: 2.4rem;
+  padding: 1.05rem 1.15rem;
+}
+
+.related ul {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}

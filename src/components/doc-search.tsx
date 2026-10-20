@@ -8,6 +8,8 @@ export type SearchEntry = {
   title: string;
   description: string | null;
   group: string | null;
+  /** Topics from the page's frontmatter: "movies", "games". */
+  tags: string[];
   /** Whole page as plain text, built at render time in lib/markdown.ts. */
   text: string;
 };
@@ -26,6 +28,7 @@ function score(entry: SearchEntry, tokens: string[]): number {
   const title = entry.title.toLowerCase();
   const description = (entry.description ?? "").toLowerCase();
   const text = entry.text.toLowerCase();
+  const tags = entry.tags.join(" ");
 
   let total = 0;
   for (const token of tokens) {
@@ -34,12 +37,16 @@ function score(entry: SearchEntry, tokens: string[]): number {
     if (
       !title.includes(token) &&
       !description.includes(token) &&
+      !tags.includes(token) &&
       !text.includes(token)
     ) {
       return 0;
     }
     if (title.startsWith(token)) total += 12;
     else if (title.includes(token)) total += 8;
+    // A tag is a word the page chose for itself: "games" finds the Minecraft
+    // page even though its title never says so.
+    if (tags.includes(token)) total += 6;
     if (description.includes(token)) total += 3;
     if (text.includes(token)) total += 1;
   }
