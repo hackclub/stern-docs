@@ -7,16 +7,16 @@ tags: [youtube, video]
 related:
   - guides/jellyfin
   - guides/how-compose-works
-synced: "2026-10-20"
+synced: "2026-11-02"
 sources:
   - label: "Tube Archivist Docs, home page"
     href: "https://docs.tubearchivist.com/"
     author: "Tube Archivist contributors, GPL-3.0"
-    note: "Welcome line and Getting Started list copied verbatim; icons removed. Upstream commit bb7ee4d."
+    note: "Welcome line and Getting Started list copied verbatim; icons removed. Upstream commit 8224be1."
   - label: "Tube Archivist Docs, \"Setting up Tube Archivist with Docker\""
     href: "https://docs.tubearchivist.com/installation/docker-compose/"
     author: "Tube Archivist contributors, GPL-3.0"
-    note: "Copied verbatim; the custom-port subsections left out, links made absolute. Upstream commit bb7ee4d."
+    note: "Copied verbatim; the custom-port subsections left out, links made absolute. Upstream commit 8224be1."
 ---
 
 Welcome to the official Tube Archivist Docs. This is an up-to-date documentation of user functionality.
@@ -69,17 +69,10 @@ Save the [docker-compose.yml](https://github.com/tubearchivist/tubearchivist/blo
 > All you really _need_ to configure is the [`TA_HOST`](https://docs.tubearchivist.com/installation/env-vars/#ta_host) environment variable.
 
 #### Networking
-The main container serves the interface on port `8000` with Nginx. Nginx is packaged in the container and serves the static files and handles proxy requests to the backend.
+The main container serves the interface on port `8000` with `uvicorn`. That also serves the frontend bundle, static assets and media files. That is a compromize between simplicity with Python native tooling and some performance overhead.
 
 - For port collisions, see [Docker for Beginners/#networking](https://docs.tubearchivist.com/installation/docker-for-beginners/#networking).
 - Alternatively to modify the port, see [Environment Variables/#TA_PORT](https://docs.tubearchivist.com/installation/env-vars/#ta_port)
-
-The React TS based frontend is compiled and served by Nginx from the `static` folder.
-
-The Python Django based backend is served with `uvicorn` on the container internal port `8080`.
-
-- Only container internal. Nginx handles proxying requests to the backend
-- To modify, see [Environment Variables/#TA_BACKEND_PORT](https://docs.tubearchivist.com/installation/env-vars/#ta_backend_port)
 
 #### Volumes
 This container expects two volumes:

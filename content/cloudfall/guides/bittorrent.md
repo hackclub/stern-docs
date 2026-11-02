@@ -7,7 +7,7 @@ tags: [torrents, downloads]
 related:
   - guides/hardlinks
   - guides/jellyfin
-synced: "2026-10-20"
+synced: "2026-11-02"
 sources:
   - label: "Wikipedia, \"BitTorrent\""
     href: "https://en.wikipedia.org/w/index.php?title=BitTorrent&oldid=1380656127"
@@ -18,13 +18,13 @@ sources:
     author: "Wikipedia contributors, CC BY-SA 4.0"
     note: "Lead copied verbatim. Revision of 2026-10-11."
   - label: "Wikipedia, \"Torrent file\""
-    href: "https://en.wikipedia.org/w/index.php?title=Torrent_file&oldid=1376196185"
+    href: "https://en.wikipedia.org/w/index.php?title=Torrent_file&oldid=1383291296"
     author: "Wikipedia contributors, CC BY-SA 4.0"
-    note: "Lead copied verbatim. Revision of 2026-09-22."
+    note: "Lead copied verbatim. Revision of 2026-11-01."
   - label: "Wikipedia, \"Legal issues with BitTorrent\""
-    href: "https://en.wikipedia.org/w/index.php?title=Legal_issues_with_BitTorrent&oldid=1367743959"
+    href: "https://en.wikipedia.org/w/index.php?title=Legal_issues_with_BitTorrent&oldid=1383147113"
     author: "Wikipedia contributors, CC BY-SA 4.0"
-    note: "First paragraph copied verbatim. Revision of 2026-08-04."
+    note: "First paragraph copied verbatim. Revision of 2026-11-01."
   - label: "BEP 3: The BitTorrent Protocol Specification"
     href: "https://www.bittorrent.org/beps/bep_0003.html"
     author: "Bram Cohen; placed in the public domain"
@@ -79,9 +79,9 @@ In computing, and specifically peer-to-peer file sharing, seeding is the uploadi
 
 ## Torrent file
 
-In the BitTorrent file distribution system, a torrent file or meta-info file is a computer file that contains metadata about files and folders to be distributed, and usually also a list of the network locations of trackers, which are computers that help participants in the system find each other and form efficient distribution groups called swarms. Torrent files are normally named with the extension .torrent.
+In the BitTorrent file distribution protocol, a torrent file or metainfo file is a computer file format that contains metadata about files and folders to be distributed, in addition to  a list of  network locations of trackers, which are computers that help participants in the system find each other and form efficient distribution groups called swarms. Torrent files use .torrent as the filename extension.
 
-A torrent file acts like a table of contents (index) that allows computers to find information through the use of a torrent client. With the help of a torrent file, one can download small parts of the original file from computers that have already downloaded it. These "peers" allow for downloading of the file in addition to, or in place of, the primary server. A torrent file does not contain the content to be distributed; it only contains information about those files, such as their names, folder structure, sizes, and cryptographic hash values for verifying file integrity.
+A torrent file acts as a table of contents (index), allowing a client to find other decentralized nodes interacting with the same torrent file. With the help of a torrent file, one can download small parts of the original file from nodes that have already downloaded it. These "peers" enable clients to download one or many files. A torrent file does not contain the content to be distributed; it only contains metadata information about those files, such as their names, folder structure, sizes, and cryptographic hash values for verifying file integrity. Torrent files also contain SHA cryptographic hashes of the file pieces. 
 
 ## Anonymity
 
