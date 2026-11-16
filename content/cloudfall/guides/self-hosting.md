@@ -1,6 +1,6 @@
 ---
 title: "Self-hosting"
-description: "Self-hosting is the practice of running a website or service on a home server instead of a web hosting service outside of the administrator's own control."
+description: "Self-hosting is the practice of running a website or service on either a home server or a server fully under the user's control, as opposed to using a service managed by someone else."
 group: learn
 order: 1
 tags: [basics, server]
@@ -8,12 +8,12 @@ related:
   - self-hosting-basics
   - guides/what-is-a-container
   - guides/how-compose-works
-synced: "2026-10-20"
+synced: "2026-11-16"
 sources:
   - label: "Wikipedia, \"Self-hosting (network)\""
-    href: "https://en.wikipedia.org/w/index.php?title=Self-hosting_(network)&oldid=1366399103"
+    href: "https://en.wikipedia.org/w/index.php?title=Self-hosting_(network)&oldid=1384606978"
     author: "Wikipedia contributors, CC BY-SA 4.0"
-    note: "Sections copied verbatim; wiki markup converted to Markdown. Revision of 2026-07-27."
+    note: "Sections copied verbatim; wiki markup converted to Markdown. Revision of 2026-11-09."
   - label: "Wikipedia, \"Home server\""
     href: "https://en.wikipedia.org/w/index.php?title=Home_server&oldid=1357085181"
     author: "Wikipedia contributors, CC BY-SA 4.0"
@@ -24,7 +24,7 @@ sources:
     note: "The two opening paragraphs copied verbatim from README.md. Upstream commit 3eaf827."
 ---
 
-Self-hosting is the practice of running a website or service on a home server instead of a web hosting service outside of the administrator's own control. Self-hosting allows users to have more control over their data, privacy, and computing infrastructure, as well as potentially saving costs and improving skills.
+Self-hosting is the practice of running a website or service on either a home server or a server fully under the user's control, as opposed to using a service managed by someone else. Self-hosting allows users to have more control over their data, privacy, and computing infrastructure, as well as potentially saving costs and improving skills.
 
 ## Getting Started with Self-Hosting
 

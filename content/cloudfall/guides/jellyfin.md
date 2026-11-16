@@ -9,28 +9,28 @@ related:
   - guides/hardlinks
   - guides/navidrome
   - pick-a-project
-synced: "2026-10-20"
+synced: "2026-11-16"
 sources:
   - label: "Wikipedia, \"Jellyfin\""
-    href: "https://en.wikipedia.org/w/index.php?title=Jellyfin&oldid=1376506673"
+    href: "https://en.wikipedia.org/w/index.php?title=Jellyfin&oldid=1383746937"
     author: "Wikipedia contributors, CC BY-SA 4.0"
-    note: "Lead copied verbatim. Revision of 2026-09-24."
+    note: "Lead copied verbatim. Revision of 2026-11-04."
   - label: "Jellyfin documentation, \"Quick Start\""
     href: "https://jellyfin.org/docs/general/quick-start"
     author: "Jellyfin contributors, CC BY-ND 4.0"
-    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 915333d."
+    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 28eaf16."
   - label: "Jellyfin documentation, \"Container\""
     href: "https://jellyfin.org/docs/general/installation/container"
     author: "Jellyfin contributors, CC BY-ND 4.0"
-    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 915333d."
+    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 28eaf16."
   - label: "Jellyfin documentation, \"Movies\""
     href: "https://jellyfin.org/docs/general/server/media/movies"
     author: "Jellyfin contributors, CC BY-ND 4.0"
-    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 915333d."
+    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 28eaf16."
   - label: "Jellyfin documentation, \"TV Shows\""
     href: "https://jellyfin.org/docs/general/server/media/shows"
     author: "Jellyfin contributors, CC BY-ND 4.0"
-    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 915333d."
+    note: "Sections copied whole and unchanged, as the licence requires; only relative links were made absolute, site components removed and headings nested. Upstream commit 28eaf16."
 ---
 
 Jellyfin is a free and open-source media server and suite of multimedia applications designed to organize, manage, and share digital media files to networked devices. Jellyfin consists of a server application installed on a machine running Linux, Microsoft Windows, or macOS; and another application running on a client device such as a smartphone, tablet, smart TV, streaming media player, game console or in a web browser. Jellyfin also can serve media to DLNA and Chromecast-enabled devices. It is a fork of Emby.
@@ -158,6 +158,8 @@ The video files within the folder should have the same name as the folder. I.e. 
 - Example with year: `Jellyfin Documentary (2030).mkv`
 - Example with metadata provider id: `Jellyfin Documentary [imdbid-tt00000000].mkv`
 - Example with both year and metadata provider id: `Jellyfin Documentary (2030) [imdbid-tt00000000].mkv`
+
+The provider ID must be added to both the parent folder and file when using [Multiple Versions](https://jellyfin.org/docs/general/server/media/movies.md#multiple-versions).
 
 ## TV Shows
 
